@@ -1,24 +1,9 @@
 <?php
 
 use Cake\Cache\Engine\FileEngine;
-use Cake\Database\Connection;
-use Cake\Database\Driver\Mysql;
 use Cake\Error\ExceptionRenderer;
-use Cake\Log\Engine\FileLog;
-use Cake\Mailer\Transport\MailTransport;
 
 return [
-    /**
-     * Debug Level:
-     *
-     * Production Mode:
-     * false: No error messages, errors, or warnings shown.
-     *
-     * Development Mode:
-     * true: Errors and warnings shown.
-     */
-    'debug' => filter_var(env('DEBUG', true), FILTER_VALIDATE_BOOLEAN),
-
     /**
      * Configure basic information about the application.
      *
@@ -50,8 +35,8 @@ return [
     'App' => [
         'namespace' => 'App',
         'encoding' => env('APP_ENCODING', 'UTF-8'),
-        'defaultLocale' => env('APP_DEFAULT_LOCALE', 'en_US'),
-        'defaultTimezone' => env('APP_DEFAULT_TIMEZONE', 'UTC'),
+        'defaultLocale' => env('APP_DEFAULT_LOCALE', 'pt_BR'),
+        'defaultTimezone' => env('APP_DEFAULT_TIMEZONE', 'America/Sao_Paulo'),
         'base' => false,
         'dir' => 'src',
         'webroot' => 'webroot',
@@ -66,17 +51,6 @@ return [
             'templates' => [APP . 'Template' . DS],
             'locales' => [APP . 'Locale' . DS],
         ],
-    ],
-
-    /**
-     * Security and encryption configuration
-     *
-     * - salt - A random string used in security hashing methods.
-     *   The salt value is also used as the encryption key.
-     *   You should treat it as extremely sensitive data.
-     */
-    'Security' => [
-        'salt' => env('SECURITY_SALT', 'c7dc482249a36e0107dfba84d16f875ac1d14d91a1f29dd93fd2602036dc66f9'),
     ],
 
     /**
@@ -182,171 +156,6 @@ return [
         'skipLog' => [],
         'log' => true,
         'trace' => true,
-    ],
-
-    /**
-     * Email configuration.
-     *
-     * By defining transports separately from delivery profiles you can easily
-     * re-use transport configuration across multiple profiles.
-     *
-     * You can specify multiple configurations for production, development and
-     * testing.
-     *
-     * Each transport needs a `className`. Valid options are as follows:
-     *
-     *  Mail   - Send using PHP mail function
-     *  Smtp   - Send using SMTP
-     *  Debug  - Do not send the email, just return the result
-     *
-     * You can add custom transports (or override existing transports) by adding the
-     * appropriate file to src/Mailer/Transport. Transports should be named
-     * 'YourTransport.php', where 'Your' is the name of the transport.
-     */
-    'EmailTransport' => [
-        'default' => [
-            'className' => MailTransport::class,
-            /*
-             * The following keys are used in SMTP transports:
-             */
-            'host' => 'localhost',
-            'port' => 25,
-            'timeout' => 30,
-            'username' => null,
-            'password' => null,
-            'client' => null,
-            'tls' => null,
-            'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null),
-        ],
-    ],
-
-    /**
-     * Email delivery profiles
-     *
-     * Delivery profiles allow you to predefine various properties about email
-     * messages from your application and give the settings a name. This saves
-     * duplication across your application and makes maintenance and development
-     * easier. Each profile accepts a number of keys. See `Cake\Mailer\Email`
-     * for more information.
-     */
-    'Email' => [
-        'default' => [
-            'transport' => 'default',
-            'from' => 'you@localhost',
-            //'charset' => 'utf-8',
-            //'headerCharset' => 'utf-8',
-        ],
-    ],
-
-    /**
-     * Connection information used by the ORM to connect
-     * to your application's datastores.
-     *
-     * ### Notes
-     * - Drivers include Mysql Postgres Sqlite Sqlserver
-     *   See vendor\cakephp\cakephp\src\Database\Driver for complete list
-     * - Do not use periods in database name - it may lead to error.
-     *   See https://github.com/cakephp/cakephp/issues/6471 for details.
-     * - 'encoding' is recommended to be set to full UTF-8 4-Byte support.
-     *   E.g set it to 'utf8mb4' in MariaDB and MySQL and 'utf8' for any
-     *   other RDBMS.
-     */
-    'Datasources' => [
-        'default' => [
-            'className' => Connection::class,
-            'driver' => Mysql::class,
-            'persistent' => false,
-            'host' => 'localhost',
-            /*
-             * CakePHP will use the default DB port based on the driver selected
-             * MySQL on MAMP uses port 8889, MAMP users will want to uncomment
-             * the following line and set the port accordingly
-             */
-            //'port' => 'non_standard_port_number',
-            'username' => 'my_app',
-            'password' => 'secret',
-            'database' => 'my_app',
-            /*
-             * You do not need to set this flag to use full utf-8 encoding (internal default since CakePHP 3.6).
-             */
-            //'encoding' => 'utf8mb4',
-            'timezone' => 'UTC',
-            'flags' => [],
-            'cacheMetadata' => true,
-            'log' => false,
-
-            /**
-             * Set identifier quoting to true if you are using reserved words or
-             * special characters in your table or column names. Enabling this
-             * setting will result in queries built using the Query Builder having
-             * identifiers quoted when creating SQL. It should be noted that this
-             * decreases performance because each query needs to be traversed and
-             * manipulated before being executed.
-             */
-            'quoteIdentifiers' => false,
-
-            /**
-             * During development, if using MySQL < 5.6, uncommenting the
-             * following line could boost the speed at which schema metadata is
-             * fetched from the database. It can also be set directly with the
-             * mysql configuration directive 'innodb_stats_on_metadata = 0'
-             * which is the recommended value in production environments
-             */
-            //'init' => ['SET GLOBAL innodb_stats_on_metadata = 0'],
-
-            'url' => env('DATABASE_URL', null),
-        ],
-
-        /**
-         * The test connection is used during the test suite.
-         */
-        'test' => [
-            'className' => Connection::class,
-            'driver' => Mysql::class,
-            'persistent' => false,
-            'host' => 'localhost',
-            //'port' => 'non_standard_port_number',
-            'username' => 'my_app',
-            'password' => 'secret',
-            'database' => 'test_myapp',
-            //'encoding' => 'utf8mb4',
-            'timezone' => 'UTC',
-            'cacheMetadata' => true,
-            'quoteIdentifiers' => false,
-            'log' => false,
-            //'init' => ['SET GLOBAL innodb_stats_on_metadata = 0'],
-            'url' => env('DATABASE_TEST_URL', null),
-        ],
-    ],
-
-    /**
-     * Configures logging options
-     */
-    'Log' => [
-        'debug' => [
-            'className' => FileLog::class,
-            'path' => LOGS,
-            'file' => 'debug',
-            'url' => env('LOG_DEBUG_URL', null),
-            'scopes' => false,
-            'levels' => ['notice', 'info', 'debug'],
-        ],
-        'error' => [
-            'className' => FileLog::class,
-            'path' => LOGS,
-            'file' => 'error',
-            'url' => env('LOG_ERROR_URL', null),
-            'scopes' => false,
-            'levels' => ['warning', 'error', 'critical', 'alert', 'emergency'],
-        ],
-        // To enable this dedicated query log, you need set your datasource's log flag to true
-        'queries' => [
-            'className' => FileLog::class,
-            'path' => LOGS,
-            'file' => 'queries',
-            'url' => env('LOG_QUERIES_URL', null),
-            'scopes' => ['queriesLog'],
-        ],
     ],
 
     /**
