@@ -78,6 +78,8 @@ try {
     Configure::load('email');
     Configure::load('debug');
     Configure::load('log');
+    Configure::load('system');
+    Configure::load('pagination');
 
 } catch (\Exception $e) {
     exit($e->getMessage() . "\n");
