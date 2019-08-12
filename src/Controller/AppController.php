@@ -16,6 +16,11 @@ namespace App\Controller;
 
 use Cake\Controller\Controller;
 use Cake\Event\Event;
+use Cake\Log\Log;
+use Cake\Network\Exception\ForbiddenException;
+use Cake\ORM\TableRegistry;
+use \Exception;
+
 
 /**
  * Application Controller
@@ -56,7 +61,7 @@ class AppController extends Controller
 
         $this->registerAccessLog();
 
-        $this->validationRole = true;
+        $this->validationRole = false;
     }
 
     /**
@@ -139,12 +144,12 @@ class AppController extends Controller
      */
     private function registerAccessLog()
     {
-        $ip = $this->request->clientIp();
-        $method = $this->request->getMethod();
-        $scheme = $this->request->scheme();
-        $host = $this->request->host();
-        $here = $this->request->getRequestTarget();
-        $agent = $_SERVER['HTTP_USER_AGENT'];
+        $ip = $this->getRequest()->clientIp();
+        $method = $this->getRequest()->getMethod();
+        $scheme = $this->getRequest()->scheme();
+        $host = $this->getRequest()->host();
+        $here = $this->getRequest()->getRequestTarget();
+        $agent = $this->getRequest()->getHeaderLine('User-Agent');
 
         $registro = "$ip    $method   $scheme://$host$here    $agent";
 
