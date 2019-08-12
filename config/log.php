@@ -30,5 +30,21 @@ return [
             'url' => env('LOG_QUERIES_URL', null),
             'scopes' => ['queriesLog'],
         ],
+        'mail' => [
+            'className' => FileLog::class,
+            'path' => LOGS,
+            'file' => 'mail',
+            'scopes' => 'mail',
+            'levels' => ['notice'],
+            'url' => env('LOG_ERROR_URL', null),
+        ],
+        'register' => [
+            'className' => FileLog::class,
+            'path' => LOGS,
+            'file' => 'access',
+            'scopes' => 'register',
+            'levels' => ['info'],
+            'url' => env('LOG_ERROR_URL', null),
+        ]
     ],
 ];
