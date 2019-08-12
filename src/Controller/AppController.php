@@ -60,6 +60,81 @@ class AppController extends Controller
     }
 
     /**
+     * Before render callback.
+     *
+     * @param \Cake\Event\Event $event The beforeRender event.
+     * @return \Cake\Network\Response|null|void
+     */
+    public function beforeFilter(Event $event)
+    {
+        if ($this->validationRole)
+        {
+            $this->controlAuth();
+
+            if($this->isAuthorized())
+            {
+                $this->accessRole();
+            }
+        }
+    }
+
+    /**
+     * Controle simplificado de autenticação do usuário
+     */
+    protected function controlAuth()
+    {
+        if (!$this->isAuthorized()) {
+            $this->redirectLogin("A sessão foi expirada!");
+        }
+    }
+
+    /**
+     * Redireciona para a tela de login com uma mensagem.
+     *
+     * @param string $mensagem Mensagem a ser exibida na tela de login.
+     * @param bool $error Se a mensagem de erro é sucesso.
+     */
+    protected function redirectLogin(string $mensagem, bool $error = true)
+    {
+        if ($error) {
+            $this->Flash->error($mensagem);
+        } else {
+            $this->Flash->success($mensagem);
+        }
+
+        $this->redirect(['controller' => 'system', 'action' => 'login']);
+    }
+
+    /**
+     * Verifica se a sessão do usuário foi criada e ativa, ou seja, se o mesmo efetuou o login.
+     *
+     * @return boolean Se o usuário está logado no sistema e com acesso
+     */
+    protected function isAuthorized()
+    {
+        return $this->getRequest()->getSession()->check('Usuario');
+    }
+
+    /**
+     * Verifica se o usuário possui a permissão de acessar a tela do sistema.
+     * @throws ForbiddenException O usuário não tem a permissão de acessar a determinada tela do sistema.
+     */
+    protected function accessRole()
+    {
+        /*
+        $controller = strtolower($this->request->getParam('controller'));
+        $action = strtolower($this->request->getParam('action'));
+
+        $url = ["controller" => $controller, "action" => $action];
+        $userID = (int) $this->getRequest()->getSession()->read('Usuario.ID');
+
+        if (!$this->Membership->handleRole($url, $userID)) {
+            throw new ForbiddenException();
+        }
+        */
+    }
+
+    /**
      * Efetua o registro de log de acesso
      */
     private function registerAccessLog()
