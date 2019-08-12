@@ -61,7 +61,7 @@ class AppController extends Controller
 
         $this->registerAccessLog();
 
-        $this->validationRole = false;
+        $this->validationRole = true;
     }
 
     /**
