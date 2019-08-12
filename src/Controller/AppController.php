@@ -29,6 +29,12 @@ class AppController extends Controller
 {
 
     /**
+     * Define se a haverá validação do papel dentro da tela de sistema.
+     * @var bool
+     */
+    protected $validationRole;
+
+    /**
      * Initialization hook method.
      *
      * Use this method to add common initialization code like loading components.
@@ -44,12 +50,29 @@ class AppController extends Controller
         $this->loadComponent('RequestHandler', [
             'enableBeforeRedirect' => false,
         ]);
-        $this->loadComponent('Flash');
 
-        /*
-         * Enable the following component for recommended CakePHP security settings.
-         * see https://book.cakephp.org/3.0/en/controllers/components/security.html
-         */
-        //$this->loadComponent('Security');
+        $this->loadComponent('Flash');
+        $this->loadComponent('Cookie');
+
+        $this->registerAccessLog();
+
+        $this->validationRole = true;
+    }
+
+    /**
+     * Efetua o registro de log de acesso
+     */
+    private function registerAccessLog()
+    {
+        $ip = $this->request->clientIp();
+        $method = $this->request->getMethod();
+        $scheme = $this->request->scheme();
+        $host = $this->request->host();
+        $here = $this->request->getRequestTarget();
+        $agent = $_SERVER['HTTP_USER_AGENT'];
+
+        $registro = "$ip    $method   $scheme://$host$here    $agent";
+
+        Log::info($registro, ['register']);
     }
 }
