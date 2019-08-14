@@ -58,6 +58,8 @@ class AppController extends Controller
 
         $this->loadComponent('Flash');
         $this->loadComponent('Cookie');
+        $this->loadComponent('Atividade');
+        $this->loadComponent('Auditoria');
 
         $this->registerAccessLog();
 
