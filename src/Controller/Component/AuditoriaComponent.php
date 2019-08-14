@@ -2,6 +2,8 @@
 
 namespace App\Controller\Component;
 
+use App\Error\AuditoriaException;
+use App\Model\Entity\Usuario;
 use Cake\Core\Configure;
 use Cake\Controller\Component;
 use Cake\ORM\TableRegistry;
@@ -14,31 +16,14 @@ use Cake\ORM\Entity;
 class AuditoriaComponent extends Component
 {
     /**
-     * Faz o registro de auditoria no sistema, por meio de sistema.
+     * Faz o registro de auditoria no sistema.
      *
-     * @param array $dados Dados a serem adicionados no banco de dados de auditoria.
-     * @return int|mixed O valor da auditoria adicionada, se inserida com sucesso.
+     * @param Auditoria $dados Dados a serem adicionados no banco de dados de auditoria.
+     * @return int Código de auditoria gerada no banco de dados.
      */
-    public function registrar(array $dados)
+    public function registrar(Auditoria $dados)
     {
-        $id = 0;
-        $table = TableRegistry::get('Auditoria');
-        $auditoria = $table->newEntity();
 
-        $auditoria->data = date("Y-m-d H:i:s");
-        $auditoria->ocorrencia = $dados['ocorrencia'];
-        $auditoria->descricao = empty($dados['descricao']) ? NULL : $dados['descricao'];
-        $auditoria->dado_adicional = empty($dados['dado_adicional']) ? NULL : $dados['dado_adicional'];
-        $auditoria->usuario = $dados['usuario'];
-        $auditoria->ip = $_SERVER['REMOTE_ADDR'];
-        $auditoria->agent = $_SERVER['HTTP_USER_AGENT'];
-
-        if($table->save($auditoria))
-        {
-            $id = $auditoria->id;
-        }
-
-        return $id;
     }
 
     /**
