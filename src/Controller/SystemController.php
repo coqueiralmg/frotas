@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Model\Entity\Auditoria;
 use App\Model\Entity\Usuario;
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
@@ -67,10 +68,11 @@ class SystemController extends AppController
 
     private function atualizarTentativas(string $mensagem)
     {
-        $tentativa = $this->getRequest()->getSession()->read('Login.attemps');
+        $session = $this->getRequest()->getSession();
+        $tentativa = $session->read('Login.attemps');
         $aviso = Configure::read('Security.login.attemps.warning');
         $limite = Configure::read('Security.login.attemps.max');
-        $this->getRequest()->getSession()->write('Login.attemps', $tentativa + 1);
+        $session->write('Login.attemps', $tentativa + 1);
 
         if ($tentativa >= $aviso && $tentativa < $limite)
         {
@@ -100,14 +102,18 @@ class SystemController extends AppController
 
     private function configurarTentativas()
     {
-        if (!$this->getRequest()->getSession()->check('Login.attemps'))
+        $session = $this->getRequest()->getSession();
+
+        if (!$session->check('Login.attemps'))
         {
-            $this->getRequest()->getSession()->write('Login.attemps', 0);
+            $session->write('Login.attemps', 0);
         }
     }
 
     private function validarLogin(Usuario $usuario, string $senha = '')
     {
+        $session = $this->getRequest()->getSession();
+
         if (!$usuario->ativo)
         {
             $this->redirectLogin("O usuário encontra-se inativo para o sistema.");
@@ -139,23 +145,29 @@ class SystemController extends AppController
 
         if ($usuario->verificar)
         {
-            $this->getRequest()->getSession()->write('Usuario.ID', $usuario->id);
+            $session->write('Usuario.ID', $usuario->id);
             $this->Flash->success('Por favor, troque a senha.');
             $this->redirect(['controller' => 'system', 'action' => 'password']);
             return;
         }
 
+        $auditoria = new Auditoria([
+            'ocorrencia' => $this->Atividade::SYSTEM_LOGON_SISTEMA,
+            'descricao' => 'O usuário efetuou login com sucesso',
+            'usuario' => $usuario->id
+        ]);
+
         if ($senha != '')
         {
-            $this->getRequest()->getSession()->write('Usuario', $usuario);
-            $this->getRequest()->getSession()->write('Usuario.ID', $usuario->id);
-            $this->getRequest()->getSession()->write('Usuario.nick', $usuario->usuario);
-            $this->getRequest()->getSession()->write('Usuario.nome', $usuario->nome);
-            $this->getRequest()->getSession()->write('Usuario.email', $usuario->email);
-            $this->getRequest()->getSession()->write('Usuario.grupo', $usuario->grupo);
+            $session->write('Usuario', $usuario);
+            $session->write('Usuario.ID', $usuario->id);
+            $session->write('Usuario.nick', $usuario->usuario);
+            $session->write('Usuario.nome', $usuario->nome);
+            $session->write('Usuario.email', $usuario->email);
+            $session->write('Usuario.grupo', $usuario->grupo);
         }
 
-        $this->getRequest()->getSession()->write('Usuario.entrada', date("Y-m-d H:i:s"));
+        $session->write('Usuario.entrada', date("Y-m-d H:i:s"));
         $this->redirect(['controller' => 'system', 'action' => 'board']);
     }
 }
