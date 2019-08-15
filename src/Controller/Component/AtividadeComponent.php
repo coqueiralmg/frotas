@@ -47,6 +47,15 @@ class AtividadeComponent extends Component
 
             throw new AuditoriaException($message, null, $ae);
         }
+    }
+
+    public function obterAtividade()
+    {
+
+    }
+
+    public function obterAtividades()
+    {
 
     }
 }
