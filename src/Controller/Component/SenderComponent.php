@@ -46,7 +46,6 @@ class SenderComponent extends Component
      * @param string $template Nome do template do envio do e-mail
      * @param array $params Parâmetros para serem usados no template do e-mail
      * @return array Resultado do envio de e-mail
-     * @deprecated Não é mais recomendado usar array para configurar envio de e-mail
      */
     public function sendEmailTemplate($headMail, $template, $params = NULL)
     {
@@ -81,11 +80,6 @@ class SenderComponent extends Component
         $this->registrarLog($headMail);
 
         return $email->send();
-    }
-
-    public function sendMailTemplate()
-    {
-
     }
 
     /**
