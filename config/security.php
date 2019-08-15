@@ -15,7 +15,7 @@ return [
                 'max' => 5,
                 'warning' => 3
             ],
-            'access' => 'public'
+            'access' => 'restrict'
         ]
     ],
 ];
