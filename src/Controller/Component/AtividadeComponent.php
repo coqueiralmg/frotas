@@ -4,6 +4,7 @@ namespace App\Controller\Component;
 
 use App\Error\AuditoriaException;
 use App\Model\Entity\Atividade;
+use Cake\Controller\Component;
 use Cake\ORM\TableRegistry;
 use Exception;
 
