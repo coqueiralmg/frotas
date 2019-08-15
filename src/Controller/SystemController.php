@@ -33,8 +33,8 @@ class SystemController extends AppController
     {
         if($this->request->is('post'))
         {
-            $login = $this->request->data['usuario'];
-            $senha = $this->request->data['senha'];
+            $login = $this->getRequest()->getData('usuario');
+            $senha = $this->getRequest()->getData('senha');
 
             if($login == '' || $senha == '')
             {
@@ -47,11 +47,11 @@ class SystemController extends AppController
 
                 $query = $t_usuarios->find('all', [
                     'contain' => ['GrupoUsuario'],
-                    'conditions' => [
-                        'Usuario.usuario' => $login,
-                    ],
-                ])->orWhere([
-                    'Usuario.email' => $login,
+                    'conditions' => ['OR' => [
+                        'usuario.usuario' => $login,
+                        'usuario.email' => $login
+                        ]
+                    ]
                 ]);
 
                 if($query->count() > 0)
@@ -87,6 +87,40 @@ class SystemController extends AppController
         else
         {
             $this->redirectLogin($mensagem);
+        }
+    }
+
+    private function bloquearAcesso()
+    {
+        $login = $this->Cookie->read('Login.User');
+        $t_usuario = TableRegistry::get('Usuario');
+
+        $query = $t_usuario->find('all', [
+            'contain' => ['Pessoa'],
+            'conditions' => ['OR' => [
+                'usuario.usuario' => $login,
+                'usuario.email' => $login
+                ]
+            ]
+        ]);
+
+        if($query->count() > 0)
+        {
+            $resultado = $query->all();
+
+            foreach($resultado as $usuario)
+            {
+                $usuario->suspenso = true;
+                $t_usuario->save($usuario);
+                $this->Monitoria->alertarContaSuspensa($usuario->pessoa->nome, $usuario->email);
+            }
+        }
+
+        $access = Configure::read('Security.login.access');
+
+        if($access == 'restrict')
+        {
+            $this->Firewall->bloquear('Tentativas de acesso indevidos.');
         }
     }
 
