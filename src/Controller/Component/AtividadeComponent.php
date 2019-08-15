@@ -9,6 +9,7 @@ use Exception;
 
 /**
  * Classe que representa a atividade a ser registrada na auditoria
+ * @package App\Controller\Component
  */
 class AtividadeComponent extends Component
 {
