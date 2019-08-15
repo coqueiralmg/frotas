@@ -45,7 +45,7 @@ class SystemController extends AppController
                 $this->Cookie->write('Login.user', $login);
                 $t_usuarios = TableRegistry::get('Usuario');
 
-                $query = $t_usuario->find('all', [
+                $query = $t_usuarios->find('all', [
                     'contain' => ['GrupoUsuario'],
                     'conditions' => [
                         'Usuario.usuario' => $login,
@@ -54,9 +54,10 @@ class SystemController extends AppController
                     'Usuario.email' => $login,
                 ]);
 
-                if($query->count > 0)
+                if($query->count() > 0)
                 {
                     $usuario = $query->first();
+                    $this->validarLogin($usuario, $senha);
                 }
                 else
                 {
@@ -156,6 +157,8 @@ class SystemController extends AppController
             'descricao' => 'O usuário efetuou login com sucesso',
             'usuario' => $usuario->id
         ]);
+
+        $this->Auditoria->registrar($auditoria);
 
         if ($senha != '')
         {
