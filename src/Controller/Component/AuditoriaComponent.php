@@ -3,6 +3,7 @@
 namespace App\Controller\Component;
 
 use App\Error\AuditoriaException;
+use App\Model\Entity\Auditoria;
 use App\Model\Entity\Usuario;
 use Cake\Core\Configure;
 use Cake\Controller\Component;
@@ -43,6 +44,14 @@ class AuditoriaComponent extends Component
                 ]);
             }
 
+            if(!$atividade->ativo)
+            {
+                throw new AuditoriaException([
+                    'message' => 'Atividade de ocorrência de auditoria não permitida',
+                    'atividade' => $auditoria->ocorrencia
+                ]);
+            }
+
             $auditoria->data = date("Y-m-d H:i:s");
             $auditoria->usuario = $auditoria->usuario ?: $request->getSession()->read('Usuario.ID');
             $auditoria->ip = $request->clientIp();
@@ -53,7 +62,7 @@ class AuditoriaComponent extends Component
             if($atividade->validar && !$auditoria->assinatura)
             {
                 throw new AuditoriaException([
-                    'message' => 'É obrigatório informar a assinatura do registro de auditoria.',
+                    'message' => 'A assinatura requerida não foi informada ou é inválida.',
                     'atividade' => $auditoria->ocorrencia
                 ]);
             }
