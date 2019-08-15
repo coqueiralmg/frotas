@@ -8,6 +8,7 @@ use Cake\Core\Configure;
 use Cake\Controller\Component;
 use Cake\ORM\TableRegistry;
 use Cake\ORM\Entity;
+use Exception;
 
 /**
  * Classe que representa o componente de controle e gerenciamento de auditoria.
@@ -16,14 +17,58 @@ use Cake\ORM\Entity;
 class AuditoriaComponent extends Component
 {
     /**
+     * Faz a associação com componentes relacionados
+     */
+    public $components = ['Atividade'];
+
+    /**
      * Faz o registro de auditoria no sistema.
      *
      * @param Auditoria $dados Dados a serem adicionados no banco de dados de auditoria.
      * @return int Código de auditoria gerada no banco de dados.
      */
-    public function registrar(Auditoria $dados)
+    public function registrar(Auditoria $auditoria)
     {
+        try
+        {
+            $atividade = $this->Atividade->validar($auditoria->ocorrencia);
+            $request = $this->getController()->getRequest();
+            $id = 0; $table = TableRegistry::get('Auditoria');
 
+            if($atividade == null)
+            {
+                throw new AuditoriaException([
+                    'message' => 'Ocorreu um erro ao buscar uma atividade',
+                    'atividade' => $auditoria->ocorrencia
+                ]);
+            }
+
+            $auditoria->data = date("Y-m-d H:i:s");
+            $auditoria->usuario = $auditoria->usuario ?: $request->getSession()->read('Usuario.ID');
+            $auditoria->ip = $request->clientIp();
+            $auditoria->agent = $request->getHeaderLine('User-Agent');
+            $auditoria->assinatura = $request->getParam('_csrfToken');
+            $auditoria->sessao = $request->getSession()->id;
+
+            if($atividade->validar && !$auditoria->assinatura)
+            {
+                throw new AuditoriaException([
+                    'message' => 'É obrigatório informar a assinatura do registro de auditoria.',
+                    'atividade' => $auditoria->ocorrencia
+                ]);
+            }
+
+            if($table->save($auditoria))
+            {
+                $id = $auditoria->id;
+            }
+
+            return $id;
+        }
+        catch(Exception $aex)
+        {
+            throw new AuditoriaException('Ocorreu um erro ao gerar um registro de auditoria', null, $aex);
+        }
     }
 
     /**
