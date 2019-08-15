@@ -48,7 +48,7 @@ class AuditoriaComponent extends Component
             $auditoria->ip = $request->clientIp();
             $auditoria->agent = $request->getHeaderLine('User-Agent');
             $auditoria->assinatura = $request->getParam('_csrfToken');
-            $auditoria->sessao = $request->getSession()->id;
+            $auditoria->sessao = $request->getSession()->id();
 
             if($atividade->validar && !$auditoria->assinatura)
             {
