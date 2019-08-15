@@ -127,27 +127,6 @@ class AuditoriaComponent extends Component
     }
 
     /**
-    * Busca o nome da ocorrência da auditoria por código
-    * @param int $codigo Código da ocorrência
-    * @return string Nome da ocorrência pré-cadastrada na lista
-    */
-    public function buscarNomeOcorrencia(int $codigo)
-    {
-        $ocorrencias = Configure::read('Auditoria.ocorrencias');
-        return $ocorrencias[$codigo];
-    }
-
-    /**
-    * Obtém todas as ocorrências pré definidas do código
-    * @return array Coletânea de todas as ocorrências pré definidas
-    */
-    public function obterOcorrencias()
-    {
-        $ocorrencias = Configure::read('Auditoria.ocorrencias');
-        return $ocorrencias;
-    }
-
-    /**
     * Obtém a lista de campos originais que foram modificados
     * @param Entity $entity Entidade a ser analisada
     * @return array Lista de campos modificados com seus valores originais
