@@ -2,6 +2,7 @@
 
 namespace App\Controller\Component;
 
+use App\Model\Entity\Auditoria;
 use Cake\Controller\Component;
 use Cake\ORM\TableRegistry;
 
@@ -15,15 +16,17 @@ class MonitoriaComponent extends Component
     /**
      * Associação com outros compomentes
      */
-    public $components = ['Cookie', 'Sender', 'Auditoria'];
+    public $components = ['Cookie', 'Sender', 'Auditoria', 'Atividade'];
 
     /*
     * Faz o registro de monitoramento, alertando os administradores
     *
     */
-    public function monitorar(array $dados)
+    public function monitorar(Auditoria $auditoria)
     {
         $emails = $this->buscarEmailsAdministradores();
+        $request = $this->getController()->getRequest();
+        $usuario = $auditoria->usuario ?: $request->getSession()->read('Usuario.nick');
 
         $header = array(
             'name' => 'Segurança Coqueiral',
@@ -33,12 +36,12 @@ class MonitoriaComponent extends Component
         );
 
         $params = array(
-            'usuário' => $this->Cookie->read('Login.User'),
-            'ip' => $_SERVER['REMOTE_ADDR'],
-            'agent' => $_SERVER['HTTP_USER_AGENT'],
-            'atividade' => $this->Auditoria->buscarNomeOcorrencia($dados['ocorrencia']),
-            'descricao_atividade' => empty($dados['descricao']) ? 'Não informado' : $dados['descricao'],
-            'chave' => $this->montaChave($this->Cookie->read('Login.User'), $_SERVER['REMOTE_ADDR'])
+            'usuário' => $usuario,
+            'ip' => $request->clientIp(),
+            'agent' => $request->getHeaderLine('User-Agent'),
+            'atividade' => $this->Atividade->obterAtividade($auditoria->ocorrencia)->nome,
+            'descricao_atividade' => $auditoria->descricao ?: 'Não informado',
+            'chave' => $this->montaChave($usuario, $request->clientIp())
         );
 
         $this->Sender->sendEmailTemplate($header, 'monitoring', $params);
