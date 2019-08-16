@@ -64,9 +64,9 @@ class MonitoriaComponent extends Component
 
         $params = array(
             'usuário' => $this->Cookie->read('Login.User'),
-            'ip' => $_SERVER['REMOTE_ADDR'],
-            'agent' => $_SERVER['HTTP_USER_AGENT'],
-            'chave' => $this->montaChave($this->Cookie->read('Login.User'), $_SERVER['REMOTE_ADDR'])
+            'ip' => $request->clientIp(),
+            'agent' => $request->getHeaderLine('User-Agent'),
+            'chave' => $this->montaChave($this->Cookie->read('Login.User'), $request->clientIp())
         );
 
         $this->Sender->sendEmailTemplate($header, 'hacking', $params);
@@ -89,8 +89,8 @@ class MonitoriaComponent extends Component
 
         $params = array(
             'usuário' => $this->Cookie->read('Login.User'),
-            'ip' => $_SERVER['REMOTE_ADDR'],
-            'agent' => $_SERVER['HTTP_USER_AGENT']
+            'ip' => $request->clientIp(),
+            'agent' => $request->getHeaderLine('User-Agent')
         );
 
         $this->Sender->sendEmailTemplate($header, 'blocked', $params);
@@ -112,7 +112,7 @@ class MonitoriaComponent extends Component
 
         $params = array(
             'nome' => $nome,
-            'ip' => $_SERVER['REMOTE_ADDR'],
+            'ip' => $request->clientIp(),
             'direto' => $direto
         );
 
