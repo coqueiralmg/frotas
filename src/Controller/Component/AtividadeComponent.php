@@ -3,7 +3,9 @@
 namespace App\Controller\Component;
 
 use App\Error\AuditoriaException;
+
 use App\Model\Entity\Atividade;
+use Cake\Cache\Cache;
 use Cake\Controller\Component;
 use Cake\ORM\TableRegistry;
 use Exception;
@@ -26,16 +28,15 @@ class AtividadeComponent extends Component
 
     /**
      * Verifica se a atividade existe no banco de dados e retorna a mesma, com todas as informações requeridas.
-     * @throws AuditoriaException O usuário não tem a permissão de acessar a determinada tela do sistema.
-     * $return Atividade Atividade da auditoria do sistema.
+     * @param int $codigoAtividade Código de atividade
+     * @throws AuditoriaException Ocorreu uma falha ao obter uma atividade de auditoria..
+     * @return Atividade Atividade da auditoria do sistema.
      */
     public function validar(int $codigoAtividade)
     {
         try
         {
-            $t_atividades = TableRegistry::get('Atividade');
-            $atividade = $t_atividades->get($codigoAtividade);
-
+            $atividade = $this->obterAtividade($codigoAtividade);
             return $atividade;
         }
         catch(Exception $ae)
@@ -49,13 +50,62 @@ class AtividadeComponent extends Component
         }
     }
 
-    public function obterAtividade()
+    /**
+     * Obtém uma atividade específica, informando um código.
+     * @param int $codigoAtividade Código de atividade
+     * @throws AuditoriaException Ocorreu uma falha ao obter uma atividade de auditoria.
+     * @return Atividade Atividade do sistema de auditoria.
+     */
+    public function obterAtividade(int $codigoAtividade)
     {
+        try
+        {
+            $atividade = null;
+            $atividades = $this->obterAtividades();
 
+            foreach($atividades as $pivot)
+            {
+                if($pivot->id == $codigoAtividade)
+                {
+                    $atividade = $pivot;
+                    break;
+                }
+            }
+
+            return $atividade;
+        }
+        catch(Exception $ae)
+        {
+            throw new AuditoriaException('Ocorreu um erro ao buscar uma atividade', null, $ae);
+        }
     }
 
+    /**
+     * Obtém uma coletânea de atividades, incluindo a possibilidade da consulta ser cacheável.
+     * @throws AuditoriaException Ocorreu uma falha ao obter uma atividade de auditoria.
+     */
     public function obterAtividades()
     {
+        try
+        {
+            $atividades = null;
 
+            if(Cache::read('ACTIVITY_AUDIT') != null)
+            {
+                $atividades = Cache::read('ACTIVITY_AUDIT');
+            }
+            else
+            {
+                $t_atividades = TableRegistry::get('Atividade');
+                $atividades = $t_atividades->find('all')->all();
+                Cache::write('ACTIVITY_AUDIT', $atividades);
+            }
+
+            return $atividades;
+        }
+        catch(Exception $ae)
+        {
+            throw new AuditoriaException('Ocorreu um erro ao buscar uma atividade', null, $ae);
+        }
     }
 }
