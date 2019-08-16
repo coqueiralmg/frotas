@@ -202,6 +202,19 @@ class SystemController extends AppController
             $session->write('Usuario.nome', $usuario->nome);
             $session->write('Usuario.email', $usuario->email);
             $session->write('Usuario.grupo', $usuario->grupo);
+
+            $tentativa = $session->read('Login.attemps');
+
+            if($tentativa >= Configure::read('Security.login.attemps.warning'))
+            {
+                $session->write('Usuario.suspeito', true);
+                $this->Monitoria->monitorar($auditoria);
+            }
+            else
+            {
+                $session->write('Usuario.suspeito', false);
+            }
+
         }
 
         $session->write('Usuario.entrada', date("Y-m-d H:i:s"));
