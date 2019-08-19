@@ -20,7 +20,6 @@ class MonitoriaComponent extends Component
 
     /*
     * Faz o registro de monitoramento, alertando os administradores
-    *
     */
     public function monitorar(Auditoria $auditoria)
     {
