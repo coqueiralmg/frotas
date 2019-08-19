@@ -22,11 +22,36 @@ class SystemController extends AppController
 
     public function login()
     {
-        $login = $this->obterLoginCookie();
-        $this->viewBuilder()->setLayout('guest');
-        $this->configurarTentativas();
-        $this->set('title', 'Controle de Acesso');
-        $this->set('login', $login);
+        if($this->getRequest()->getSession()->check('Usuario'))
+        {
+            $idUsuario = $this->getRequest()->getSession()->read('Usuario.ID');
+            $t_usuario = TableRegistry::get('Usuario');
+
+            $query = $t_usuario->find('all', [
+                'contain' => ['GrupoUsuario'],
+                'conditions' => [
+                    'Usuario.id' => $idUsuario
+                ]
+            ]);
+
+            if ($query->count() > 0)
+            {
+                $usuario = $query->first();
+                $this->validarLogin($usuario);
+            }
+            else
+            {
+                $this->atualizarTentativas('Os dados estão inválidos. Favor efetuar login.');
+            }
+        }
+        else
+        {
+            $login = $this->obterLoginCookie();
+            $this->viewBuilder()->setLayout('guest');
+            $this->configurarTentativas();
+            $this->set('title', 'Controle de Acesso');
+            $this->set('login', $login);
+        }
     }
 
     public function logon()

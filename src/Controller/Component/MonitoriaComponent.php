@@ -18,7 +18,7 @@ class MonitoriaComponent extends Component
      */
     public $components = ['Cookie', 'Sender', 'Auditoria', 'Atividade'];
 
-    /*
+    /**
     * Faz o registro de monitoramento, alertando os administradores
     */
     public function monitorar(Auditoria $auditoria)
