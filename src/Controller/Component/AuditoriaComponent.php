@@ -25,7 +25,7 @@ class AuditoriaComponent extends Component
     /**
      * Faz o registro de auditoria no sistema.
      *
-     * @param Auditoria $dados Dados a serem adicionados no banco de dados de auditoria.
+     * @param Auditoria $auditoria Dados a serem adicionados no banco de dados de auditoria.
      * @return int Código de auditoria gerada no banco de dados.
      */
     public function registrar(Auditoria $auditoria)
